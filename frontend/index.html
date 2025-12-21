@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang chủ</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #f0f0f0;
+      margin-bottom: 30px;
+      opacity: 0; /* Ẩn nội dung ban đầu */
+      transform: translateY(50px); /* Dịch chuyển xuống 50px */
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Tạo hiệu ứng chuyển tiếp */
+    }
+
+    /* Class sẽ được thêm bởi JavaScript */
+    header.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.5s ease 0.4s;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .user-details h2 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    .user-details p {
+      color: #666;
+      font-size: 14px;
+    }
+    .logout-btn {
+      padding: 10px 25px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    .logout-btn:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+    }
+    .welcome-section {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 30px;
+      opacity: 0; /* Ẩn nội dung ban đầu */
+      transform: translateY(50px); /* Dịch chuyển xuống 50px */
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Tạo hiệu ứng chuyển tiếp */
+    }
+
+    /* Class sẽ được thêm bởi JavaScript */
+    .welcome-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.5s ease 0.4s;
+    }
+    
+    .welcome-section h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+    .welcome-section p {
+      font-size: 18px;
+      opacity: 0.9;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+      opacity: 0; /* Ẩn nội dung ban đầu */
+      transform: translateY(50px); /* Dịch chuyển xuống 50px */
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Tạo hiệu ứng chuyển tiếp */
+    }
+
+/* Class sẽ được thêm bởi JavaScript */
+    .stats-grid.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.5s ease 0.4s;
+    }
+    
+
+    .stat-card {
+      background: #f8f9fa;
+      padding: 25px;
+      border-radius: 12px;
+      border-left: 4px solid #667eea;
+    }
+    .stat-card h3 {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: bold;
+      color: #333;
+    }
+    .content-section {
+      margin-top: 30px;
+    }
+    
+    .letter{
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      opacity: 0; /* Ẩn nội dung ban đầu */
+      transform: translateY(50px); /* Dịch chuyển xuống 50px */
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Tạo hiệu ứng chuyển tiếp */
+    }
+
+    /* Class sẽ được thêm bởi JavaScript */
+    .letter.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.5s ease 0.4s;
+    }
+    
+
+    .placeholder {
+      background: #f8f9fa;
+      border: 2px dashed #ddd;
+      border-radius: 12px;
+      padding: 60px;
+      text-align: left;
+      color: #999;
+      font-size: 50px;
+      padding: 50px;
+    }
+    
+    
+    .python{
+      display: flex;
+      align-items: center; 
+      gap: 16px;  
+      padding: 50px;
+      border-bottom: 2px solid #f0f0f0;
+      opacity: 0; /* Ẩn nội dung ban đầu */
+      transform: translateY(50px); /* Dịch chuyển xuống 50px */
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Tạo hiệu ứng chuyển tiếp */
+    }
+
+    /* Class sẽ được thêm bởi JavaScript */
+    .python.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.6s ease 0.4s;
+    }
+    
+    .python h2{
+      font-size: 24px;
+      color: #333;
+    }
+    
+    
+    .python img{
+      border-radius: 20px;
+    }
+    .js{
+      display: flex;
+      align-items: center; 
+      gap: 16px; 
+      padding: 50px;
+      border-bottom: 2px solid #f0f0f0;
+      opacity: 0; /* Ẩn nội dung ban đầu */
+      transform: translateY(50px); /* Dịch chuyển xuống 50px */
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Tạo hiệu ứng chuyển tiếp */
+    }
+
+/* Class sẽ được thêm bởi JavaScript */
+    .js.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.6s ease 0.4s;
+    }
+    .js h2{
+      font-size: 24px;
+      color: #333;
+    }
+    .js img{
+      border-radius: 20px;
+    }
+    .math{
+      display: flex;
+      align-items: center; 
+      gap: 16px; 
+      padding: 50px;
+      border-bottom: 2px solid #f0f0f0;
+      opacity: 0; /* Ẩn nội dung ban đầu */
+      transform: translateY(50px); /* Dịch chuyển xuống 50px */
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Tạo hiệu ứng chuyển tiếp */
+    }
+
+/* Class sẽ được thêm bởi JavaScript */
+    .math.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.6s ease 0.4s;
+    }
+    .math h2{
+      font-size: 24px;
+      color: #333;
+    }
+    .math img{
+      border-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header với thông tin user -->
+  <header>
+    <div class="user-info">
+      <div class="avatar" id="avatar"></div>
+      <div class="user-details">
+        <h2 id="username">Loading...</h2>
+        <p>Đăng nhập lúc: <span id="loginTime"></span></p>
+        <span class="info-badge" id="similarity"></span>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+  </header>
+
+  <!-- Welcome Section -->
+  <div class="welcome-section">
+    <h1>Chào mừng trở lại!</h1>
+    <p>Bạn đã đăng nhập thành công</p>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3>Thời gian online</h3>
+      <div class="value" id="onlineTime">0 phút</div>
+    </div>
+    <div class="stat-card">
+      <h3>Trạng thái</h3>
+      <div class="value" style="color: #28a745; font-size: 24px;">Đã xác thực</div>
+    </div>
+  </div>
+
+  <!-- Content Section - Bạn tự code phần này -->
+  <div class="content-section">
+    <div class = "letter"><h2>Nội dung của bạn</h2></div>
+    <div class="placeholder">
+      
+        <div class ="python" onclick=python() >
+            <img src="python.jpg" alt="python" width="300" height="200">
+            <h2>Các bài học python</h2>
+            <p style="margin-top: 10px; font-size: 30px;">
+        </div>
+      
+        <div class ="js" onclick= js()>
+          <img = src = js.jpg alt="js" width = "300" height="200">
+          <h2>Các bài học javascript</h2>
+          <p style="margin-top: 10px; font-size: 30px;"></p>
+        </div>    
+        <div class ="math" onclick= math()>
+          <img = src = math.jpg alt="js" width = "300" height="200">
+          <h2>Cùng nhau học toán lớp 5</h2>
+          <p style="margin-top: 10px; font-size: 30px;"></p>
+        </div>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const sections5 = document.querySelectorAll('header');
+
+  const observer5 = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      // Khi >= 10% phần tử xuất hiện
+      if (entry.intersectionRatio >= 0.5) {
+        entry.target.classList.add('visible');
+        entry.target.classList.remove('invisible');
+      }
+
+      // Khi chỉ còn < 50% phần tử trong viewport (tức là >50% đã biến mất)
+      if (entry.intersectionRatio < 0.5) {
+        entry.target.classList.remove('visible');
+        entry.target.classList.add('invisible');
+      }
+    });
+  }, {
+    threshold: [0.6, 0.5]
+  });
+
+  sections5.forEach(section => {
+    observer5.observe(section);
+  });
+  const sections4 = document.querySelectorAll('.welcome-section');
+
+  const observer4 = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      // Khi >= 10% phần tử xuất hiện
+      if (entry.intersectionRatio >= 0.5) {
+        entry.target.classList.add('visible');
+        entry.target.classList.remove('invisible');
+      }
+
+      // Khi chỉ còn < 50% phần tử trong viewport (tức là >50% đã biến mất)
+      if (entry.intersectionRatio < 0.5) {
+        entry.target.classList.remove('visible');
+        entry.target.classList.add('invisible');
+      }
+    });
+  }, {
+    threshold: [0.6, 0.5]
+  });
+
+  sections4.forEach(section => {
+    observer4.observe(section);
+  });
+  const sections3 = document.querySelectorAll('.letter');
+
+  const observer3 = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      // Khi >= 10% phần tử xuất hiện
+      if (entry.intersectionRatio >= 0.5) {
+        entry.target.classList.add('visible');
+        entry.target.classList.remove('invisible');
+      }
+
+      // Khi chỉ còn < 50% phần tử trong viewport (tức là >50% đã biến mất)
+      if (entry.intersectionRatio < 0.5) {
+        entry.target.classList.remove('visible');
+        entry.target.classList.add('invisible');
+      }
+    });
+  }, {
+    threshold: [0.6, 0.5]
+  });
+
+  sections3.forEach(section => {
+    observer3.observe(section);
+  });
+  const sections0 = document.querySelectorAll('.stats-grid');
+
+  const observer0 = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      // Khi >= 10% phần tử xuất hiện
+      if (entry.intersectionRatio >= 0.5) {
+        entry.target.classList.add('visible');
+        entry.target.classList.remove('invisible');
+      }
+
+      // Khi chỉ còn < 50% phần tử trong viewport (tức là >50% đã biến mất)
+      if (entry.intersectionRatio < 0.5) {
+        entry.target.classList.remove('visible');
+        entry.target.classList.add('invisible');
+      }
+    });
+  }, {
+    threshold: [0.6, 0.5]
+  });
+
+  sections0.forEach(section => {
+    observer0.observe(section);
+  });
+  const sections = document.querySelectorAll('.python');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      // Khi >= 10% phần tử xuất hiện
+      if (entry.intersectionRatio >= 0.1) {
+        entry.target.classList.add('visible');
+        entry.target.classList.remove('invisible');
+      }
+
+      // Khi chỉ còn < 50% phần tử trong viewport (tức là >50% đã biến mất)
+      if (entry.intersectionRatio < 0.5) {
+        entry.target.classList.remove('visible');
+        entry.target.classList.add('invisible');
+      }
+    });
+  }, {
+    threshold: [0.6, 0.4]
+  });
+
+  sections.forEach(section => {
+    observer.observe(section);
+  });
+  const sections1 = document.querySelectorAll('.js');
+
+  const observer1 = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      // Khi >= 10% phần tử xuất hiện
+      if (entry.intersectionRatio >= 0.1) {
+        entry.target.classList.add('visible');
+        entry.target.classList.remove('invisible');
+      }
+
+      // Khi chỉ còn < 50% phần tử trong viewport (tức là >50% đã biến mất)
+      if (entry.intersectionRatio < 0.5) {
+        entry.target.classList.remove('visible');
+        entry.target.classList.add('invisible');
+      }
+    });
+  }, {
+    threshold: [0.1, 0.5]
+  });
+
+  sections1.forEach(section => {
+    observer1.observe(section);
+  });
+  const sections2 = document.querySelectorAll('.math');
+
+  const observer2 = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+    // Khi >= 10% phần tử xuất hiện
+      if (entry.intersectionRatio >= 0.1) {
+      entry.target.classList.add('visible');
+      entry.target.classList.remove('invisible');
+      }
+
+    // Khi chỉ còn < 50% phần tử trong viewport (tức là >50% đã biến mất)
+      if (entry.intersectionRatio < 0.5) {
+      entry.target.classList.remove('visible');
+      entry.target.classList.add('invisible');
+      }
+    });
+      }, {
+      threshold: [0.1, 0.5]
+    });
+
+  sections2.forEach(section => {
+      observer2.observe(section);
+    });
+ 
+  // Load thông tin user
+  function loadUserInfo() {
+    const username = localStorage.getItem('username') || 'User';
+    const loginTime = localStorage.getItem('loginTime');
+    
+
+    // Hiển thị tên
+    document.getElementById('username').textContent = username;
+
+    function getInitials(fullName) {
+      // 1. Tách chuỗi thành mảng các từ bằng dấu cách
+      const words = fullName.split(' '); 
+      let initials = '';
+      // 2. Lặp qua từng từ
+      for (let word of words) {
+        // 3. Nếu từ không rỗng, lấy ký tự đầu tiên và thêm vào kết quả
+        if (word.length > 0) {
+          initials += word[0]; 
+        }
+      }
+      return initials.toUpperCase(); // Trả về chữ HOA
+    };
+    let vietTat = getInitials(username);
+    // Avatar chữ cái đầu
+    document.getElementById('avatar').textContent = vietTat.slice(-1);
+
+    // Thời gian đăng nhập
+    let loginDate;
+    if (loginTime) {
+      loginDate = new Date(loginTime);
+      document.getElementById('loginTime').textContent =
+        loginDate.toLocaleString('vi-VN');
+    } else {
+      document.getElementById('loginTime').textContent = 'Không xác định';
+      loginDate = new Date();
+    }
+
+    
+
+    // Cập nhật thời gian online
+    updateOnlineTime(loginDate);
+    setInterval(() => updateOnlineTime(loginDate), 60000);
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    loadUserInfo();
+  });
+
+  // Cập nhật thời gian online
+  function updateOnlineTime() {
+    const loginTime = new Date(localStorage.getItem('loginTime'));
+    const now = new Date();
+    const minutes = Math.floor((now - loginTime) / 1000 / 60);
+    
+    if (minutes < 60) {
+      document.getElementById('onlineTime').textContent = `${minutes} phút`;
+    } else {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      document.getElementById('onlineTime').textContent = `${hours}h ${mins}m`;
+    }
+  }
+
+  // Đăng xuất
+  function logout() {
+    if (confirm('Bạn có chắc muốn đăng xuất?')) {
+      localStorage.removeItem('username');
+      localStorage.removeItem('loginTime');
+      localStorage.removeItem('similarity');
+      window.location.href = 'FE.html';
+    }
+  }
+  function python(){
+    window.location.href = 'py.html'
+
+  }
+  function js(){
+    window.location.href = 'js.html'
+
+  }
+  function math(){
+    window.location.href = 'math.html'
+
+  }
+  // Khởi động
+  if (checkAuth()) {
+    loadUserInfo();
+  }
+</script>
+
+</body>
+</html>
