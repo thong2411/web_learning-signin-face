@@ -13,8 +13,10 @@ import cv2
 import numpy as np
 import pickle
 
+from backend.detechcheat import detect_head_gesture
+
 # Import từ file main.py
-from main import (
+from backend.login_reg import (
     register_face,
     known_faces,
     cosine_similarity,
@@ -200,6 +202,106 @@ async def authenticate(image: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Lỗi: {str(e)}")
 
+@app.post("/detect-head-gesture")
+async def detect_gesture(image: UploadFile = File(...)):
+    """
+    Phát hiện cử chỉ đầu quay trái, phải, lên, xuống
+    
+    Args:
+        image: File ảnh cần phát hiện cử chỉ
+    
+    Returns:
+        JSON với thông tin cử chỉ, góc xoay và độ tin cậy
+    """
+    try:
+        # Đọc ảnh từ request
+        image_bytes = await image.read()
+        np_img = np.frombuffer(image_bytes, np.uint8)
+        frame = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+        
+        if frame is None:
+            raise HTTPException(status_code=400, detail="Không thể đọc ảnh")
+        
+        # Phát hiện cử chỉ
+        result = detect_head_gesture(frame)
+        
+        return {
+            "status": "success" if result['detected'] else "no_face",
+            "data": result
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi: {str(e)}")
+
+
+@app.post("/authenticate-with-gesture")
+async def authenticate_with_gesture(image: UploadFile = File(...)):
+    """
+    Xác thực khuôn mặt + phát hiện cử chỉ đầu cùng lúc
+    Hữu ích cho liveness detection
+    
+    Args:
+        image: File ảnh
+    
+    Returns:
+        JSON với cả thông tin authentication và head gesture
+    """
+    try:
+        # Đọc ảnh
+        image_bytes = await image.read()
+        np_img = np.frombuffer(image_bytes, np.uint8)
+        frame = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+        
+        if frame is None:
+            raise HTTPException(status_code=400, detail="Không thể đọc ảnh")
+        
+        # 1. Phát hiện cử chỉ
+        gesture_result = detect_head_gesture(frame)
+        
+        # 2. Xác thực khuôn mặt
+        auth_result = {
+            "authenticated": False,
+            "name": "Unknown",
+            "similarity": 0
+        }
+        
+        embedding_result = get_face_embedding_from_frame(frame)
+        if embedding_result is not None:
+            embedding, (x, y, w, h) = embedding_result
+            
+            # So sánh với database
+            best_match = "Unknown"
+            best_similarity = -1
+            
+            for name, known_embedding in known_faces.items():
+                similarity = cosine_similarity(embedding, known_embedding)
+                if similarity > best_similarity:
+                    best_similarity = similarity
+                    best_match = name
+            
+            if best_similarity > THRESHOLD:
+                auth_result = {
+                    "authenticated": True,
+                    "name": best_match,
+                    "similarity": float(best_similarity)
+                }
+            else:
+                auth_result = {
+                    "authenticated": False,
+                    "name": "Unknown",
+                    "similarity": float(best_similarity)
+                }
+        
+        # Kết hợp kết quả
+        return {
+            "status": "success",
+            "authentication": auth_result,
+            "head_gesture": gesture_result
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi: {str(e)}")
+
 
 @app.get("/users")
 def list_users():
@@ -257,4 +359,4 @@ def health_check():
         "registered_users": len(known_faces),
         "threshold": THRESHOLD
     }
-# uvicorn server:app --reload --host 0.0.0.0 --port 8000
+# uvicorn backend.server:app --reload --host 0.0.0.0 --port 8000
