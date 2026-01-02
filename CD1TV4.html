@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kiểm tra Toán lớp 2</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
+    header {
+      text-align: center;
+      padding-bottom: 25px;
+      border-bottom: 3px solid #667eea;
+      margin-bottom: 30px;
+    }
+    header h1 {
+      font-size: 32px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    header p {
+      color: #666;
+      font-size: 16px;
+    }
+    .timer {
+      background: #ff6b6b;
+      color: white;
+      padding: 12px 25px;
+      border-radius: 25px;
+      display: inline-block;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+    .question-card {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+      border-left: 5px solid #667eea;
+    }
+    .question-number {
+      color: #667eea;
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .question-text {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .option {
+      background: white;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      padding: 15px 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .option:hover {
+      border-color: #667eea;
+      background: #f0f4ff;
+      transform: translateX(5px);
+    }
+    .option input[type="radio"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    .option.correct {
+      border-color: #28a745;
+      background: #d4edda;
+    }
+    .option.incorrect {
+      border-color: #dc3545;
+      background: #f8d7da;
+    }
+    .submit-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 15px 40px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: block;
+      margin: 30px auto;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    .submit-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+    }
+    .submit-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .result-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .result-content {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 500px;
+      text-align: center;
+      animation: slideDown 0.5s;
+    }
+    @keyframes slideDown {
+      from {
+        transform: translateY(-100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    .result-score {
+      font-size: 72px;
+      font-weight: bold;
+      color: #667eea;
+      margin: 20px 0;
+    }
+    .result-message {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .result-detail {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .restart-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 30px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .restart-btn:hover {
+      background: #218838;
+      transform: scale(1.05);
+    }
+    .back {
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 30px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .back:hover {
+      background: #218838;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Kiểm tra tiếng việt lớp 4</h1>
+    <p>Chủ đề: Từ và câu - Dấu câu cơ bản</p>
+    <div class="timer" id="timer">Thời gian: 30:00</div>
+  </header>
+
+  <form id="quizForm">
+    <!-- Câu 1 -->
+    <div class="question-card">
+      <div class="question-number">Câu 1</div>
+      <div class="question-text">Từ nào dưới đây là danh từ?</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q1" value="A"> <span>A. Chạy</span></label>
+        <label class="option"><input type="radio" name="q1" value="B"> <span>B. Đẹp</span></label>
+        <label class="option"><input type="radio" name="q1" value="C"> <span>C. Học sinh</span></label>
+        <label class="option"><input type="radio" name="q1" value="D"> <span>D. Nhanh</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 2 -->
+    <div class="question-card">
+      <div class="question-number">Câu 2</div>
+      <div class="question-text">Từ nào dưới đây là động từ?</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q2" value="A"> <span>A. Sách</span></label>
+        <label class="option"><input type="radio" name="q2" value="B"> <span>B. Bàn</span></label>
+        <label class="option"><input type="radio" name="q2" value="C"> <span>C. Học</span></label>
+        <label class="option"><input type="radio" name="q2" value="D"> <span>D. Cao</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 3 -->
+    <div class="question-card">
+      <div class="question-number">Câu 3</div>
+      <div class="question-text">Từ nào dưới đây là tính từ?</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q3" value="A"> <span>A. Ăn</span></label>
+        <label class="option"><input type="radio" name="q3" value="B"> <span>B. Đẹp</span></label>
+        <label class="option"><input type="radio" name="q3" value="C"> <span>C. Viết</span></label>
+        <label class="option"><input type="radio" name="q3" value="D"> <span>D. Học</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 4 -->
+    <div class="question-card">
+      <div class="question-number">Câu 4</div>
+      <div class="question-text">Câu nào dưới đây là câu kể?</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q4" value="A"> <span>A. Bạn đang làm gì?</span></label>
+        <label class="option"><input type="radio" name="q4" value="B"> <span>B. Ôi, cảnh đẹp quá!</span></label>
+        <label class="option"><input type="radio" name="q4" value="C"> <span>C. Em đi học đúng giờ.</span></label>
+        <label class="option"><input type="radio" name="q4" value="D"> <span>D. Hãy giữ gìn vệ sinh lớp học.</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 5 -->
+    <div class="question-card">
+      <div class="question-number">Câu 5</div>
+      <div class="question-text">Dấu câu nào dùng để kết thúc câu kể ?</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q5" value="A"> <span>A. Dấu chấm hỏi (?)</span></label>
+        <label class="option"><input type="radio" name="q5" value="B"> <span>B. Dấu chấm than (!)</span></label>
+        <label class="option"><input type="radio" name="q5" value="C"> <span>C. Dấu phẩy (,)</span></label>
+        <label class="option"><input type="radio" name="q5" value="D"> <span>D. Dấu chấm (.)</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 6 -->
+    <div class="question-card">
+      <div class="question-number">Câu 6</div>
+      <div class="question-text">Kết quả của phép tính 72 − 40 là:</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q6" value="A"> <span>A. 22</span></label>
+        <label class="option"><input type="radio" name="q6" value="B"> <span>B. 32</span></label>
+        <label class="option"><input type="radio" name="q6" value="C"> <span>C. 42</span></label>
+        <label class="option"><input type="radio" name="q6" value="D"> <span>D. 52</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 7 -->
+    <div class="question-card">
+      <div class="question-number">Câu 7</div>
+      <div class="question-text">Số nào nhỏ hơn 38?</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q7" value="A"> <span>A. 42</span></label>
+        <label class="option"><input type="radio" name="q7" value="B"> <span>B. 39</span></label>
+        <label class="option"><input type="radio" name="q7" value="C"> <span>C. 35</span></label>
+        <label class="option"><input type="radio" name="q7" value="D"> <span>D. 48</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 8 -->
+    <div class="question-card">
+      <div class="question-number">Câu 8</div>
+      <div class="question-text">Kết quả của phép tính 19 + 21 là:</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q8" value="A"> <span>A. 30</span></label>
+        <label class="option"><input type="radio" name="q8" value="B"> <span>B. 39</span></label>
+        <label class="option"><input type="radio" name="q8" value="C"> <span>C. 40</span></label>
+        <label class="option"><input type="radio" name="q8" value="D"> <span>D. 41</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 9 -->
+    <div class="question-card">
+      <div class="question-number">Câu 9</div>
+      <div class="question-text">Phép tính nào đúng?</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q9" value="A"> <span>A. 60 − 20 = 50</span></label>
+        <label class="option"><input type="radio" name="q9" value="B"> <span>B. 40 + 30 = 60</span></label>
+        <label class="option"><input type="radio" name="q9" value="C"> <span>C. 70 − 30 = 40</span></label>
+        <label class="option"><input type="radio" name="q9" value="D"> <span>D. 20 + 50 = 60</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 10 -->
+    <div class="question-card">
+      <div class="question-number">Câu 10</div>
+      <div class="question-text">Số liền sau của số 59 là:</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q10" value="A"> <span>A. 58</span></label>
+        <label class="option"><input type="radio" name="q10" value="B"> <span>B. 60</span></label>
+        <label class="option"><input type="radio" name="q10" value="C"> <span>C. 69</span></label>
+        <label class="option"><input type="radio" name="q10" value="D"> <span>D. 50</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 11 -->
+    <div class="question-card">
+      <div class="question-number">Câu 11</div>
+      <div class="question-text">Kết quả của phép tính 84 − 24 là:</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q11" value="A"> <span>A. 50</span></label>
+        <label class="option"><input type="radio" name="q11" value="B"> <span>B. 60</span></label>
+        <label class="option"><input type="radio" name="q11" value="C"> <span>C. 70</span></label>
+        <label class="option"><input type="radio" name="q11" value="D"> <span>D. 40</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 12 -->
+    <div class="question-card">
+      <div class="question-number">Câu 12</div>
+      <div class="question-text">Số nào là tổng của 36 và 14?</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q12" value="A"> <span>A. 40</span></label>
+        <label class="option"><input type="radio" name="q12" value="B"> <span>B. 45</span></label>
+        <label class="option"><input type="radio" name="q12" value="C"> <span>C. 50</span></label>
+        <label class="option"><input type="radio" name="q12" value="D"> <span>D. 60</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 13 -->
+    <div class="question-card">
+      <div class="question-number">Câu 13</div>
+      <div class="question-text">Phép tính 65 − ___ = 25</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q13" value="A"> <span>A. 30</span></label>
+        <label class="option"><input type="radio" name="q13" value="B"> <span>B. 35</span></label>
+        <label class="option"><input type="radio" name="q13" value="C"> <span>C. 40</span></label>
+        <label class="option"><input type="radio" name="q13" value="D"> <span>D. 45</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 14 -->
+    <div class="question-card">
+      <div class="question-number">Câu 14</div>
+      <div class="question-text">Trong các phép tính sau, phép tính nào có kết quả nhỏ nhất?</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q14" value="A"> <span>A. 20 + 30</span></label>
+        <label class="option"><input type="radio" name="q14" value="B"> <span>B. 60 − 20</span></label>
+        <label class="option"><input type="radio" name="q14" value="C"> <span>C. 40 + 10</span></label>
+        <label class="option"><input type="radio" name="q14" value="D"> <span>D. 70 − 30</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 15 -->
+    <div class="question-card">
+      <div class="question-number">Câu 15</div>
+      <div class="question-text">Số tròn chục lớn nhất nhỏ hơn 68 là:</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q15" value="A"> <span>A. 50</span></label>
+        <label class="option"><input type="radio" name="q15" value="B"> <span>B. 60</span></label>
+        <label class="option"><input type="radio" name="q15" value="C"> <span>C. 70</span></label>
+        <label class="option"><input type="radio" name="q15" value="D"> <span>D. 40</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 16 -->
+    <div class="question-card">
+      <div class="question-number">Câu 16</div>
+      <div class="question-text">Kết quả của phép tính 90 − 50 là:</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q16" value="A"> <span>A. 30</span></label>
+        <label class="option"><input type="radio" name="q16" value="B"> <span>B. 40</span></label>
+        <label class="option"><input type="radio" name="q16" value="C"> <span>C. 50</span></label>
+        <label class="option"><input type="radio" name="q16" value="D"> <span>D. 60</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 17 -->
+    <div class="question-card">
+      <div class="question-number">Câu 17</div>
+      <div class="question-text">Phép tính nào có kết quả bằng 70?</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q17" value="A"> <span>A. 40 + 20</span></label>
+        <label class="option"><input type="radio" name="q17" value="B"> <span>B. 90 − 30</span></label>
+        <label class="option"><input type="radio" name="q17" value="C"> <span>C. 50 + 10</span></label>
+        <label class="option"><input type="radio" name="q17" value="D"> <span>D. 80 − 20</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 18 -->
+    <div class="question-card">
+      <div class="question-number">Câu 18</div>
+      <div class="question-text">Số cần tìm: ___ + 25 = 75</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q18" value="A"> <span>A. 40</span></label>
+        <label class="option"><input type="radio" name="q18" value="B"> <span>B. 45</span></label>
+        <label class="option"><input type="radio" name="q18" value="C"> <span>C. 50</span></label>
+        <label class="option"><input type="radio" name="q18" value="D"> <span>D. 55</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 19 -->
+    <div class="question-card">
+      <div class="question-number">Câu 19</div>
+      <div class="question-text">Kết quả của phép tính 68 − 8 là:</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q19" value="A"> <span>A. 50</span></label>
+        <label class="option"><input type="radio" name="q19" value="B"> <span>B. 60</span></label>
+        <label class="option"><input type="radio" name="q19" value="C"> <span>C. 70</span></label>
+        <label class="option"><input type="radio" name="q19" value="D"> <span>D. 58</span></label>
+      </div>
+    </div>
+
+    <!-- Câu 20 -->
+    <div class="question-card">
+      <div class="question-number">Câu 20</div>
+      <div class="question-text">Tổng của hai số lớn nhất có một chữ số là:</div>
+      <div class="options">
+        <label class="option"><input type="radio" name="q20" value="A"> <span>A. 16</span></label>
+        <label class="option"><input type="radio" name="q20" value="B"> <span>B. 17</span></label>
+        <label class="option"><input type="radio" name="q20" value="C"> <span>C. 18</span></label>
+        <label class="option"><input type="radio" name="q20" value="D"> <span>D. 19</span></label>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn"> Nộp bài</button>
+  </form>
+</div>
+
+<!-- Modal hiển thị kết quả -->
+<div class="result-modal" id="resultModal">
+  <div class="result-content">
+    <h2 style="color: #667eea; margin-bottom: 20px;"> Kết quả kiểm tra</h2>
+    <div class="result-score" id="resultScore">0/20</div>
+    <div class="result-message" id="resultMessage"></div>
+    <div class="result-detail" id="resultDetail"></div>
+    <button class="restart-btn" onclick="restartQuiz()"> Làm lại</button>
+    <button class="back" onclick = backdash()> Trở về</button>
+  </div>
+</div>
+
+<script>
+  // Đáp án đúng
+  const answers = {
+    q1: 'A', q2: 'B', q3: 'A', q4: 'B', q5: 'C',
+    q6: 'B', q7: 'C', q8: 'C', q9: 'C', q10: 'B',
+    q11: 'B', q12: 'C', q13: 'C', q14: 'A', q15: 'B',
+    q16: 'B', q17: 'B', q18: 'C', q19: 'B', q20: 'C'
+  };
+
+  // Timer 30 phút
+  let timeLeft = 30 * 60;
+  const timerElement = document.getElementById('timer');
+  
+  const timerInterval = setInterval(() => {
+    timeLeft--;
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    timerElement.textContent = `Thời gian: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+    
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      submitQuiz();
+    }
+  }, 1000);
+
+  // Submit form
+  document.getElementById('quizForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    submitQuiz();
+  });
+
+  function submitQuiz() {
+    clearInterval(timerInterval);
+    
+    let score = 0;
+    const formData = new FormData(document.getElementById('quizForm'));
+    
+    // Chấm điểm
+    for (let i = 1; i <= 20; i++) {
+      const userAnswer = formData.get(`q${i}`);
+      const correctAnswer = answers[`q${i}`];
+      
+      if (userAnswer === correctAnswer) {
+        score++;
+      }
+      
+      // Đánh dấu đúng/sai
+      const questionCard = document.querySelectorAll('.question-card')[i - 1];
+      const options = questionCard.querySelectorAll('.option');
+      
+      options.forEach(option => {
+        const input = option.querySelector('input');
+        if (input.value === correctAnswer) {
+          option.classList.add('correct');
+        }
+        if (input.checked && input.value !== correctAnswer) {
+          option.classList.add('incorrect');
+        }
+        input.disabled = true;
+      });
+    }
+    
+    // Hiển thị kết quả
+    showResult(score);
+    
+    // Disable nút submit
+    document.querySelector('.submit-btn').disabled = true;
+  }
+
+  function showResult(score) {
+    const modal = document.getElementById('resultModal');
+    const scoreElement = document.getElementById('resultScore');
+    const messageElement = document.getElementById('resultMessage');
+    const detailElement = document.getElementById('resultDetail');
+    
+    scoreElement.textContent = `${score}/20`;
+    
+    const percentage = (score / 20) * 100;
+    
+    if (percentage >= 90) {
+      messageElement.textContent = 'Xuất sắc!';
+      detailElement.textContent = 'Em làm bài rất tốt! Tiếp tục phát huy nhé!';
+    } else if (percentage >= 70) {
+      messageElement.textContent = 'Khá tốt!';
+      detailElement.textContent = 'Em làm được khá tốt. Cố gắng hơn nữa nhé!';
+    } else if (percentage >= 50) {
+      messageElement.textContent = 'Khá!';
+      detailElement.textContent = 'Em cần ôn tập thêm một chút nữa!';
+    } else {
+      messageElement.textContent = 'Cần cố gắng!';
+      detailElement.textContent = 'Em hãy xem lại bài và làm lại nhé!';
+    }
+    
+    modal.style.display = 'flex';
+  }
+  function backdash(){
+    window.location.href = 'tv4.html'
+  }
+  function restartQuiz() {
+    location.reload();
+  }
+</script>
+
+</body>
+</html>

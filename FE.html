@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Face Login / Register</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      background: #fff;
+      padding: 30px;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 15px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    h2 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+    .video-container {
+      position: relative;
+      margin: 20px 0;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #000;
+    }
+    video {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    canvas {
+      display: none;
+    }
+    input {
+      width: 100%;
+      margin-top: 15px;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: border-color 0.3s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    button {
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #667eea;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    button:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    button.login {
+      background: #764ba2;
+    }
+    button.login:hover {
+      background: #653a8f;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .users-list {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      text-align: left;
+    }
+    .users-list h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .users-list ul {
+      list-style: none;
+      padding: 0;
+    }
+    .users-list li {
+      padding: 8px;
+      background: white;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>GameQuiz</h2>
+
+  <div class="video-container">
+    <video id="video" autoplay playsinline></video>
+  </div>
+  <canvas id="canvas"></canvas>
+
+  <input type="text" id="name" placeholder="Nhập tên của bạn (cho đăng ký)" />
+
+  <button onclick="register()"> Đăng ký Tài Khoản</button>
+  <button class="login" onclick="login()"> Đăng nhập</button>
+  
+
+  <div class="result" id="result"></div>
+  
+  <div class="users-list" id="usersList" style="display:none">
+    <h3>Người dùng đã đăng ký:</h3>
+    <ul id="usersUl"></ul>
+  </div>
+</div>
+
+<script>
+  const API = "http://127.0.0.1:8000";
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const resultDiv = document.getElementById('result');
+  const nameInput = document.getElementById('name');
+
+  // Mở webcam
+  async function startCamera() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { width: 640, height: 480 } 
+      });
+      video.srcObject = stream;
+      showResult('Webcam đã sẵn sàng ', 'info');
+    } catch (err) {
+      showResult('Không thể mở webcam. Vui lòng cho phép truy cập camera.', 'error');
+      console.error(err);
+    }
+  }
+
+  // Chụp ảnh từ webcam
+  function captureFrame() {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+    return new Promise(resolve => {
+      canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.95);
+    });
+  }
+
+  // Hiển thị kết quả
+  function showResult(message, type = 'info') {
+    resultDiv.className = `result ${type}`;
+    resultDiv.innerHTML = message;
+  }
+
+  function showLoading(message) {
+    resultDiv.className = 'result info';
+    resultDiv.innerHTML = `<div class="loading"></div>${message}`;
+  }
+
+  // Đăng ký khuôn mặt
+  async function register() {
+    const name = nameInput.value.trim();
+    if (!name) {
+      showResult('Vui lòng nhập tên để đăng ký', 'error');
+      return;
+    }
+
+    showLoading('Đang đăng ký...');
+
+    try {
+      const imageBlob = await captureFrame();
+      const form = new FormData();
+      form.append('name', name);
+      form.append('image', imageBlob, 'face.jpg');
+
+      const res = await fetch(`${API}/register`, { 
+        method: 'POST', 
+        body: form 
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        showResult(` ${data.message}`, 'success');
+        nameInput.value = '';
+      } else {
+        showResult(` ${data.detail || 'Đăng ký thất bại'}`, 'error');
+      }
+    } catch (err) {
+      showResult('Lỗi kết nối server. Kiểm tra server đã chạy chưa?', 'error');
+      console.error(err);
+    }
+  }
+
+  // Đăng nhập bằng khuôn mặt
+  async function login() {
+    showLoading('Đang xác thực...');
+
+    try {
+      const imageBlob = await captureFrame();
+      const form = new FormData();
+      form.append('image', imageBlob, 'face.jpg');
+
+      const res = await fetch(`${API}/authenticate`, { 
+        method: 'POST', 
+        body: form 
+      });
+      const data = await res.json();
+
+      if (data.status === 'success') {
+        // Hiển thị thông báo thành công
+        showResult(
+          ` Xin chào <strong>&nbsp;${data.name}</strong> !<br>
+          <small>Đang chuyển trang...</small>`, 
+          'success'
+        );
+        
+        // Lưu thông tin vào localStorage
+        localStorage.setItem('username', data.name);
+        localStorage.setItem('loginTime', new Date().toISOString());
+        localStorage.setItem('similarity', data.similarity);
+        
+        // Chuyển sang dashboard sau 1.5 giây
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1500);
+        
+      } else if (data.status === 'no_face') {
+        showResult('Không phát hiện khuôn mặt trong ảnh', 'error');
+      } else {
+        showResult(
+          `Không nhận diện được<br>`, 
+          'error'
+        );
+      }
+    } catch (err) {
+      showResult('Lỗi kết nối server', 'error');
+      console.error(err);
+    }
+  }
+  // Khởi động camera khi trang load
+  startCamera();
+</script>
+
+</body>
+</html>
